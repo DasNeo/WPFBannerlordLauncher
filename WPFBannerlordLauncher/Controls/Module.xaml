@@ -11,26 +11,43 @@
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="100" /> <!-- Used for Icons I think -->
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1.5*" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <TextBlock Text="{Binding Title}" Grid.ColumnSpan="3" VerticalAlignment="Center" Margin="20" />
-            <TextBlock Text="{Binding Version}" Grid.Row="1" VerticalAlignment="Center" Margin="20,0,20,0" />
-            <Grid Grid.Row="1" Grid.Column="1">
+            <Grid Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="20,20,0,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding Title}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <materialDesign:Card Background="{DynamicResource SecondaryHueMidBrush}" Padding="5,0,5,0" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <TextBlock Text="{Binding Version}" Foreground="{DynamicResource MaterialDesignLightForeground}" HorizontalAlignment="Center" />
+                    </materialDesign:Card>
+                    <materialDesign:Card Background="{DynamicResource SecondaryHueMidBrush}" Padding="5,0,5,0" VerticalAlignment="Center" Margin="10,0,0,0">
+                        <TextBlock Text="Requires Harmony" Foreground="{DynamicResource MaterialDesignLightForeground}" HorizontalAlignment="Center" />
+                    </materialDesign:Card>
+                </StackPanel>
+            </Grid>
+            <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="20,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="0,0,2.5,5" Content="Open in Nexusmods" />
-                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="2.5, 0, 0, 5" Grid.Column="1" Content="Open in Nexusmods" />
-                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="5, 0, 0, 5" Grid.Column="2" Content="Open in Nexusmods" />
+                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="2.5, 0, 0, 5" Grid.Column="1" Content="Open local folder" />
+                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="5, 0, 0, 5" Grid.Column="2" Content="Endorse Mod" />
             </Grid>
-            <materialDesign:PackIcon Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}" Foreground="IndianRed" Width="30" Height="30" Kind="AlertCircle" Grid.Column="3" Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
+            <materialDesign:PackIcon Margin="30,0,30,0" MouseDown="PackIcon_MouseDown" Cursor="Hand" Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}" Foreground="IndianRed" Width="30" Height="30" Kind="AlertCircle" Grid.Column="3" Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <materialDesign:PackIcon.ToolTip>
+                    <ToolTip Style="{DynamicResource MaterialDesignToolTip}" Content="{Binding FormattedErrors}" />
+                </materialDesign:PackIcon.ToolTip>
+            </materialDesign:PackIcon>
         </Grid>
     </materialDesign:Card>
 </UserControl>

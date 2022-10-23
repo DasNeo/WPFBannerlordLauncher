@@ -44,10 +44,10 @@ namespace WPFBannerlordLauncher.Controls
             }
         }
 
-        public bool HasErrors => !string.IsNullOrWhiteSpace(errors);
+        public bool HasErrors => errors.Count > 0;
 
-        private string errors { get; set; }
-        public string Errors
+        private List<string> errors { get; set; } = new List<string>();
+        public List<string> Errors
         {
             get => errors;
             set
@@ -55,6 +55,15 @@ namespace WPFBannerlordLauncher.Controls
                 errors = value;
                 OnPropertyChanged();
                 OnPropertyChanged("HasErrors");
+                OnPropertyChanged("FormattedErrors");
+            }
+        }
+
+        public string FormattedErrors
+        {
+            get
+            {
+                return String.Join("\r", Errors);
             }
         }
 
@@ -69,6 +78,16 @@ namespace WPFBannerlordLauncher.Controls
         {
             this.DataContext = this;
             InitializeComponent();
+        }
+
+        private void PackIcon_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            ((MainWindow)App.Current.MainWindow).IsDialogOpen = true;
+            ((MainWindow)App.Current.MainWindow).DialogContent = new DialogShowError()
+            {
+                FormattedErrors = FormattedErrors,
+                Title = $"Error with mod {Title} - {Version}"
+            };
         }
     }
 }

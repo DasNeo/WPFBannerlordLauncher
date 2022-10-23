@@ -6,31 +6,44 @@
         xmlns:local="clr-namespace:WPFBannerlordLauncher"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" xmlns:controls="clr-namespace:WPFBannerlordLauncher.Controls"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes" 
+        xmlns:controls="clr-namespace:WPFBannerlordLauncher.Controls"
+        xmlns:dd="urn:gong-wpf-dragdrop"
         TextElement.Foreground="{DynamicResource MaterialDesignBody}"
         TextElement.FontWeight="Regular"
         TextElement.FontSize="13"
         TextOptions.TextFormattingMode="Ideal" 
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
-        FontFamily="{DynamicResource MaterialDesignFont}">
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="50" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="2*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <TextBlock Text="Title" VerticalAlignment="Center" HorizontalAlignment="Center" />
-        <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource MaterialDesignFilledComboBox}" SelectedIndex="0" materialDesign:HintAssist.Hint="Playset">
-            <ComboBox.Items>
-                <ComboBoxItem Content="Test" />
-            </ComboBox.Items>
-        </ComboBox>
-        <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2">
-            <StackPanel x:Name="stkPanel" VirtualizingPanel.IsVirtualizing="True" />
-        </ScrollViewer>
-    </Grid>
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Loaded="Window_Loaded">
+    <materialDesign:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="50" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Content="Start Game" Margin="10" />
+                <Button Grid.Column="1" Margin="10" Content="Continue Game" />
+            </Grid>
+            <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource MaterialDesignFilledComboBox}" SelectedIndex="0" materialDesign:HintAssist.Hint="Playset">
+                <ComboBox.Items>
+                    <ComboBoxItem Content="Test" />
+                </ComboBox.Items>
+            </ComboBox>
+            <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" VirtualizingPanel.IsVirtualizing="True" CanContentScroll="False">
+                <ItemsControl ItemsSource="{Binding Modules}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" />
+                <!--<StackPanel x:Name="stkPanel" VirtualizingPanel.IsVirtualizing="True" />-->
+            </ScrollViewer>
+        </Grid>
+    </materialDesign:DialogHost>
 </Window>
