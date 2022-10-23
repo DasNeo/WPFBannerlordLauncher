@@ -26,9 +26,9 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="5,0" Content="Open in Nexusmods" />
-                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="5,0" Grid.Column="1" Content="Open in Nexusmods" />
-                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="5,0" Grid.Column="2" Content="Open in Nexusmods" />
+                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="0,0,2.5,5" Content="Open in Nexusmods" />
+                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="2.5, 0, 0, 5" Grid.Column="1" Content="Open in Nexusmods" />
+                <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="5, 0, 0, 5" Grid.Column="2" Content="Open in Nexusmods" />
             </Grid>
             <materialDesign:PackIcon Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}" Foreground="IndianRed" Width="30" Height="30" Kind="AlertCircle" Grid.Column="3" Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center" />
         </Grid>

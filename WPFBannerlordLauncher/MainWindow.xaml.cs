@@ -12,6 +12,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Media.Media3D;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Xml;
@@ -41,7 +42,7 @@ namespace WPFBannerlordLauncher
         {
             if (!Directory.Exists(path))
                 return;
-
+            List<Module> mods = new List<Module>();
             Task.Factory.StartNew(() =>
             {
                 foreach (var dir in Directory.GetDirectories(path))
@@ -83,14 +84,22 @@ namespace WPFBannerlordLauncher
                     Modules.Add(model);
                     App.Current.Dispatcher.Invoke(() =>
                     {
-                        stkPanel.Children.Add(new Module()
+                        mods.Add(new Module()
                         {
                             Title = model.Name,
                             Version = model.Version,
                         });
                     });
                 }
+            }).ContinueWith((a) =>
+            {
+                App.Current.Dispatcher.Invoke(() =>
+                {
+                    foreach (var mod in mods)
+                        stkPanel.Children.Add(mod);
+                });
             });
+            
         }
         
         // No idea if that works. :D
