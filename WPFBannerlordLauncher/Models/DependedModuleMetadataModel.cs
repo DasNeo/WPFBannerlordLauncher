@@ -12,5 +12,6 @@ namespace WPFBannerlordLauncher.Models
         public string order { get; set; }
         public string optional { get; set; }
         public string version { get; set; }
+        public string incompatible { get; set; }
     }
 }

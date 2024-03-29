@@ -16,7 +16,8 @@
         TextOptions.TextRenderingMode="Auto"        
         Background="{DynamicResource MaterialDesignPaper}"
         FontFamily="{DynamicResource MaterialDesignFont}"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+        Closing="Window_Closing">
     <materialDesign:DialogHost IsOpen="{Binding IsDialogOpen}" DialogContent="{Binding DialogContent}">
         <Grid>
             <Grid.RowDefinitions>
@@ -26,22 +27,27 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="2*" />
                 <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Button Content="Start Game" Margin="10" />
-                <Button Grid.Column="1" Margin="10" Content="Continue Game" />
+                <Button Content="Start Game" Margin="10" Background="#b8a123" />
+                <Button Grid.Column="1" Margin="10" Content="Continue Game" Background="#b8a123" />
+                <Button Margin="0,0,10,0" Click="SettingsButton_Click" Grid.Column="2" Style="{DynamicResource MaterialDesignFloatingActionMiniSecondaryButton}"  Background="#b8a123" BorderBrush="#b8a123">
+                    <materialDesign:PackIcon Kind="Settings" />
+                </Button>
             </Grid>
-            <ComboBox Grid.Row="0" Grid.Column="1" Style="{StaticResource MaterialDesignFilledComboBox}" SelectedIndex="0" materialDesign:HintAssist.Hint="Playset">
-                <ComboBox.Items>
-                    <ComboBoxItem Content="Test" />
-                </ComboBox.Items>
-            </ComboBox>
-            <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" VirtualizingPanel.IsVirtualizing="True" CanContentScroll="False">
-                <ItemsControl ItemsSource="{Binding Modules}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" />
+            <ComboBox SelectedItem="{Binding SelectedPlaylist}" ItemsSource="{Binding Playlists}" Grid.Row="0" Grid.Column="1" Style="{StaticResource MaterialDesignFilledComboBox}" SelectedIndex="0" materialDesign:HintAssist.Hint="Playset" />
+
+            <Button Margin="10,0,10,0" Click="Button_Click" Grid.Column="2" Style="{DynamicResource MaterialDesignFloatingActionMiniSecondaryButton}"  Background="#b8a123" BorderBrush="#b8a123">
+                <materialDesign:PackIcon Kind="Plus" />
+            </Button>
+            <ScrollViewer Grid.Row="1" Grid.ColumnSpan="3" VirtualizingPanel.IsVirtualizing="True" CanContentScroll="False">
+                <ItemsControl x:Name="modulesContainer" ItemsSource="{Binding Modules}" dd:DragDrop.IsDragSource="True" dd:DragDrop.IsDropTarget="True" dd:DragDrop.DropHandler="{Binding}" />
                 <!--<StackPanel x:Name="stkPanel" VirtualizingPanel.IsVirtualizing="True" />-->
             </ScrollViewer>
         </Grid>

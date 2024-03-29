@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Xml;
+using System.Xml.Linq;
 using WPFBannerlordLauncher.Controls;
 using WPFBannerlordLauncher.Models;
 using Module = WPFBannerlordLauncher.Controls.Module;
@@ -16,7 +18,35 @@ namespace WPFBannerlordLauncher.Classes
 {
     public class ModuleLoader
     {
-        public List<ModuleModel> Modules { get; set; } = new List<ModuleModel>();
+        public static List<ModuleModel> Modules { get; set; } = new List<ModuleModel>();
+        public static List<Playlist> Playlists { get; set; } = new List<Playlist>();
+
+        internal static string playlistJsonPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "playlists.json");
+
+        public static async Task LoadPlaylists()
+        {
+            await new TaskFactory().StartNew(() =>
+            {
+                if (!File.Exists(playlistJsonPath))
+                {
+                    var json = JsonConvert.SerializeObject(Playlists);
+                    File.WriteAllText(playlistJsonPath, json);
+                }
+                else
+                {
+                    Playlists = JsonConvert.DeserializeObject<List<Playlist>>(File.ReadAllText(playlistJsonPath)) ?? new List<Playlist>();
+                }
+            });
+        }
+
+        public static async Task SavePlaylists()
+        {
+            await new TaskFactory().StartNew(() =>
+            {
+                var json = JsonConvert.SerializeObject(Playlists);
+                File.WriteAllText(playlistJsonPath, json);
+            });
+        }
 
         // assume path is inside /modules/
         public async Task<List<Module>> GetModules(string path)
@@ -41,43 +71,64 @@ namespace WPFBannerlordLauncher.Classes
                         continue;
 
                     XmlDocument xml = new XmlDocument();
-                    xml.Load(subModule);
-
-                    var id = xml.GetElementsByTagName("Id").Item(0);
-                    var name = xml.GetElementsByTagName("Name").Item(0);
-                    var version = xml.GetElementsByTagName("Version").Item(0);
-                    var dependencies = xml.GetElementsByTagName("DependedModule");
-                    var subModules = xml.GetElementsByTagName("SubModule");
-                    var metadata = xml.GetElementsByTagName("DependedModuleMetadata");
-                    var xmls = xml.GetElementsByTagName("XmlNode");
-
-                    ModuleModel model = new ModuleModel()
+                    using (XmlReader reader = XmlReader.Create(subModule, new XmlReaderSettings()
                     {
-                        Id = id?.Attributes?[0].Value ?? "",
-                        Name = name?.Attributes?[0].Value ?? "",
-                        Version = version?.Attributes?[0].Value ?? "",
-                    };
-
-                    model.DependedModules = GetAttributes<DependedModuleModel>(dependencies);
-                    model.DependedModuleMetadatas = GetAttributes<DependedModuleMetadataModel>(metadata);
-                    model.SubModules = GetAttributes<SubModuleModel>(subModules);
-                    model.Xmls = GetAttributes<WPFBannerlordLauncher.Models.XmlNode>(xmls);
-
-                    Modules.Add(model);
-                    App.Current.Dispatcher.Invoke(() =>
+                        IgnoreComments = true,
+                    }))
                     {
-                        modules.Add(new Module()
+
+                        xml.Load(reader);
+
+                        var id = xml.GetElementsByTagName("Id").Item(0);
+                        var name = xml.GetElementsByTagName("Name").Item(0);
+                        var isOfficial = xml.GetElementsByTagName("ModuleType").Item(0);
+                        var version = xml.GetElementsByTagName("Version").Item(0);
+                        var dependencies = xml.GetElementsByTagName("DependedModule");
+                        var loadAfter = xml.GetElementsByTagName("ModulesToLoadAfterThis");
+                        var subModules = xml.GetElementsByTagName("SubModule");
+                        var metadata = xml.GetElementsByTagName("DependedModuleMetadata");
+                        var xmls = xml.GetElementsByTagName("XmlNode");
+
+                        if (loadAfter.Count > 0)
                         {
-                            Title = model.Name,
-                            Version = model.Version,
-                            Margin = new Thickness(5),
-                            Errors = new List<string>()
+                            loadAfter = loadAfter.Item(0)?.ChildNodes;
+                        }
+                        ModuleModel model = new ModuleModel()
+                        {
+                            Id = id?.Attributes?[0].Value ?? "",
+                            Name = name?.Attributes?[0].Value ?? "",
+                            Version = version?.Attributes?[0].Value ?? "",
+                            Official = isOfficial?.Attributes?[0].Value ?? "",
+                        };
+
+                        model.DependedModules = GetAttributes<DependedModuleModel>(dependencies);
+                        if (loadAfter.Count > 0)
+                            model.ModulesToLoadAfterThis = GetAttributes<ModulesToLoadAfterThisModel>(loadAfter);
+                        model.DependedModuleMetadatas = GetAttributes<DependedModuleMetadataModel>(metadata);
+                        model.SubModules = GetAttributes<SubModuleModel>(subModules);
+                        model.Xmls = GetAttributes<WPFBannerlordLauncher.Models.XmlNode>(xmls);
+
+                        Modules.Add(model);
+                        App.Current.Dispatcher.Invoke(() =>
+                        {
+                            var module = new Module()
                             {
+                                Title = model.Name,
+                                Version = model.Version,
+                                Margin = new Thickness(5),
+                                Errors = new List<string>()
+                                {
                                 "Error 1",
                                 "Error 2"
-                            }
+                                },
+                                ModuleModel = model,
+                            };
+                            foreach (var depMod in model.DependedModules)
+                                module.Dependencies.Add(depMod.Id);
+
+                            modules.Add(module);
                         });
-                    });
+                    }
                 }
             });
             return modules;
@@ -88,13 +139,15 @@ namespace WPFBannerlordLauncher.Classes
             List<T> list = new List<T>();
 
             bool useNode = false;
-            if (dependencies.Count == 1 && dependencies[0].ChildNodes.Count >= 0)
+            XmlNodeList internalDependencies = dependencies;
+            if (dependencies.Count == 1 && dependencies[0].ChildNodes.Count > 0)
             {
-                useNode = true;
-                dependencies = dependencies[0].ChildNodes;
+                //useNode = true;
+                internalDependencies = dependencies[0].ChildNodes;
             }
             T mod = (T)Activator.CreateInstance(typeof(T));
-            foreach (XmlNode node in dependencies)
+
+            foreach (XmlNode node in internalDependencies)
             {
                 if (node.Name == "#comment")
                     continue;
@@ -103,9 +156,13 @@ namespace WPFBannerlordLauncher.Classes
 
                 foreach (XmlAttribute attr in node.Attributes)
                 {
-                    PropertyInfo? prop = typeof(T).GetProperty((useNode ? node.Name : attr.Name));
+                    PropertyInfo? prop = typeof(T).GetProperty(node.Name);
                     if (prop is null)
-                        continue;
+                    {
+                        prop = typeof(T).GetProperty(attr.Name);
+                        if(prop is null)
+                            continue;
+                    }
                     try
                     {
                         // prop is XmlNameModel XmlName
@@ -122,7 +179,9 @@ namespace WPFBannerlordLauncher.Classes
 
             }
             if (useNode)
+            {
                 list.Add(mod);
+            }
             return list;
         }
     }

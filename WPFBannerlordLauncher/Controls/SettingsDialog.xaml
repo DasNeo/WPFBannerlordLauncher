@@ -1,0 +1,32 @@
+﻿<UserControl x:Class="WPFBannerlordLauncher.Controls.SettingsDialog"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:WPFBannerlordLauncher.Controls" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <materialDesign:Card>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <materialDesign:ColorZone Mode="PrimaryDark">
+                <TextBlock Text="Settings" HorizontalAlignment="Center" Style="{DynamicResource MaterialDesignBody1TextBlock}" />
+            </materialDesign:ColorZone>
+            <materialDesign:ColorZone Mode="Dark" Grid.Row="1" VerticalAlignment="Stretch">
+                <StackPanel Grid.Row="1" Margin="10">
+                    <TextBox Text="{Binding Path}" Style="{DynamicResource MaterialDesignFloatingHintTextBox}" materialDesign:HintAssist.Hint="Bannerlord Folder (\\steamapps\\common\\Mount &amp; Blade II Bannerlord\\)" />
+                    <StackPanel Orientation="Horizontal">
+                        <ToggleButton IsChecked="{Binding Compact, Mode=TwoWay}" Checked="ToggleButton_CheckedChanged" Unchecked="ToggleButton_CheckedChanged" Margin="0,10,0,0" HorizontalAlignment="Left" Style="{DynamicResource MaterialDesignActionDarkToggleButton}" Background="#b8a123" />
+                        <TextBlock Text="Show compact modlist" VerticalAlignment="Center" Margin="10,5,0,0" />
+                    </StackPanel>
+                    <Button Margin="0,10" Content="Rearrange current modlist" Click="Button_Click" />
+                </StackPanel>
+            </materialDesign:ColorZone>
+            <Button Click="Button_Click_1" Content="Close" Grid.Row="2" />
+        </Grid>
+    </materialDesign:Card>
+</UserControl>

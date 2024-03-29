@@ -3,37 +3,46 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:WPFBannerlordLauncher.Controls" xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:local="clr-namespace:WPFBannerlordLauncher.Controls" 
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:mw="clr-namespace:WPFBannerlordLauncher"
              mc:Ignorable="d" 
              d:DesignHeight="100" 
-             d:DesignWidth="800">
-    <materialDesign:Card>
+             d:DesignWidth="800"
+             x:Name="ModuleUserControl">
+    <materialDesign:Card MouseDown="Card_MouseDown" Background="{Binding CardBackground}">
         <Grid>
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="120" />
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="1.5*" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="20,20,0,20">
+            <CheckBox IsChecked="{Binding IsChecked}" Unchecked="CheckBox_Unchecked" Checked="CheckBox_Checked" Grid.RowSpan="2" Margin="10,0,0,0" Style="{DynamicResource MaterialDesignActionDarkToggleButton}" Background="#b8a123" />
+            <Grid Grid.Column="1" Grid.ColumnSpan="2" VerticalAlignment="Center" Margin="20,20,0,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding Title}" />
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                    <materialDesign:Card Background="{DynamicResource SecondaryHueMidBrush}" Padding="5,0,5,0" VerticalAlignment="Center" Margin="10,0,0,0">
-                        <TextBlock Text="{Binding Version}" Foreground="{DynamicResource MaterialDesignLightForeground}" HorizontalAlignment="Center" />
-                    </materialDesign:Card>
-                    <materialDesign:Card Background="{DynamicResource SecondaryHueMidBrush}" Padding="5,0,5,0" VerticalAlignment="Center" Margin="10,0,0,0">
-                        <TextBlock Text="Requires Harmony" Foreground="{DynamicResource MaterialDesignLightForeground}" HorizontalAlignment="Center" />
-                    </materialDesign:Card>
+                <StackPanel Grid.Column="1" HorizontalAlignment="Right" Orientation="Horizontal">
+                    <local:Badge Title="{Binding Version, ElementName=ModuleUserControl}" BadgeBackground="ForestGreen" Margin="0,0,10,0" />
+                    <Expander Visibility="{Binding Compact, Converter={StaticResource BooleanToVisibilityConverter}}" Header="Dependencies" Grid.Column="1" HorizontalAlignment="Right">
+                        <ItemsControl ItemsSource="{Binding Badges}" Margin="30,10,30,10">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Orientation="Vertical" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                        </ItemsControl>
+                    </Expander>
                 </StackPanel>
             </Grid>
-            <Grid Grid.Row="1" Grid.ColumnSpan="2" Margin="20,0,0,0">
+            <Grid Grid.Row="1" Grid.Column="1" Visibility="{Binding Compact, Converter={StaticResource BooleanToVisibilityConverter}}" Grid.ColumnSpan="3" Margin="20,0,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -43,11 +52,18 @@
                 <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="2.5, 0, 0, 5" Grid.Column="1" Content="Open local folder" />
                 <Button Style="{DynamicResource MaterialDesignOutlinedLightButton}" Margin="5, 0, 0, 5" Grid.Column="2" Content="Endorse Mod" />
             </Grid>
-            <materialDesign:PackIcon Margin="30,0,30,0" MouseDown="PackIcon_MouseDown" Cursor="Hand" Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}" Foreground="IndianRed" Width="30" Height="30" Kind="AlertCircle" Grid.Column="3" Grid.RowSpan="2" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <materialDesign:PackIcon.ToolTip>
-                    <ToolTip Style="{DynamicResource MaterialDesignToolTip}" Content="{Binding FormattedErrors}" />
-                </materialDesign:PackIcon.ToolTip>
-            </materialDesign:PackIcon>
+            <StackPanel Margin="20,0,20,0" Orientation="Horizontal" Grid.Column="3" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <materialDesign:PackIcon Margin="0,0,10,0" MouseDown="PackIcon2_MouseDown" Cursor="Hand" Visibility="{Binding HasWarnings, Converter={StaticResource BooleanToVisibilityConverter}}" Foreground="DarkOrange" Width="30" Height="30" Kind="AlertCircle">
+                    <materialDesign:PackIcon.ToolTip>
+                        <ToolTip Style="{DynamicResource MaterialDesignToolTip}" Content="{Binding FormattedWarnings}" />
+                    </materialDesign:PackIcon.ToolTip>
+                </materialDesign:PackIcon>
+                <materialDesign:PackIcon MouseDown="PackIcon_MouseDown" Cursor="Hand" Visibility="{Binding HasErrors, Converter={StaticResource BooleanToVisibilityConverter}}" Foreground="IndianRed" Width="30" Height="30" Kind="CloseCircle">
+                    <materialDesign:PackIcon.ToolTip>
+                        <ToolTip Style="{DynamicResource MaterialDesignToolTip}" Content="{Binding FormattedErrors}" />
+                    </materialDesign:PackIcon.ToolTip>
+                </materialDesign:PackIcon>
+            </StackPanel>
         </Grid>
     </materialDesign:Card>
 </UserControl>
